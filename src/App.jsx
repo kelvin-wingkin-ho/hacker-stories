@@ -29,13 +29,25 @@ const List = ({list}) => {
 
 const Search = ({ search, onSearch }) => {
   return (
-    <div>
+    <>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" value={search}
         onChange={onSearch}/>
-    </div>
+    </>
   )
 }
+
+const useStorageState = (key, initialState) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue]
+};
 
 const App = () => {
   const stories = [
@@ -57,13 +69,10 @@ const App = () => {
     }
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState(
-    localStorage.getItem('search') || 'React'
+  const [searchTerm, setSearchTerm] = useStorageState(
+    'search',
+    'React'
   );
-
-  React.useEffect(() => {
-    localStorage.setItem('search', searchTerm);
-  }, [searchTerm])
 
   const searchedStories = stories.filter(story => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,12 +83,12 @@ const App = () => {
   }
 
   return (
-    <div>
+    <>
       <h1>My Hacker Stories</h1>
       <Search search={searchTerm} onSearch={handleSearch}/>
       <hr/>
       <List list={searchedStories}/>
-    </div>
+    </>
   );
 }
 
