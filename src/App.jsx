@@ -87,33 +87,6 @@ const useStorageState = (key, initialState) => {
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query='
 
 const App = () => {
-  const initialStories = [
-    {
-      title: 'React',
-      url: 'htts://reactjs.org/',
-      author: 'Jordan Walke',
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: 'Redux',
-      url: 'htts://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    }
-  ];
-
-  const getAsyncStories = () => 
-    new Promise((resolve) =>
-      setTimeout(
-        () => resolve({data: {stories: initialStories}}),
-        2000
-      )
-    );
-
   const storiesReducer = (state, action) => {
     switch (action.type) {
       case 'STORIES_FETCH_INIT':
@@ -146,19 +119,17 @@ const App = () => {
     'React'
   );
 
-  // const [stories, setStories] = React.useState([]);
-  // const [isLoading, setIsLoading] = React.useState(false);
-  // const [isError, setIsError] = React.useState(false);
-
   const [stories, dispatchStories] = React.useReducer(
     storiesReducer, 
     {data: [], isLoading: false, isError: false}
   );
 
   React.useEffect(() => {
+    if (searchTerm === '') return;
+
     dispatchStories({type: 'STORIES_FETCH_INIT'});
 
-    fetch(`${API_ENDPOINT}react`)
+    fetch(`${API_ENDPOINT}${searchTerm}`)
       .then((response) => response.json())
       .then((result) => {
         dispatchStories({
@@ -169,7 +140,7 @@ const App = () => {
       .catch(() => 
         dispatchStories({type: 'STORIES_FETCH_FAILURE'})
       );
-  }, [])
+  }, [searchTerm])
 
   const handleRemoveStory = (item) => {
     dispatchStories({
@@ -177,10 +148,6 @@ const App = () => {
       payload: item
     })
   }
-
-  const searchedStories = stories.data.filter(story => {
-    return story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  });
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value)
@@ -206,7 +173,7 @@ const App = () => {
         stories.isLoading ? (
           <p>Loading ...</p>
         ) : (
-          <List list={searchedStories} onRemoveItem={handleRemoveStory}/>
+          <List list={stories.data} onRemoveItem={handleRemoveStory}/>
         )
       }
     </>
