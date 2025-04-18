@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 const welcome = {
-  greeting: 'Hey',
+  greeting: 'Heys',
   title: 'React'
 }
 
