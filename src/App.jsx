@@ -87,6 +87,28 @@ const useStorageState = (key, initialState) => {
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query='
 
+const SearchForm = ({
+  searchTerm,
+  onSearchSubmit,
+  onSearchInput,
+}) => (
+  <form onSubmit={onSearchSubmit}>
+    <InputWithLabel 
+      id="search" 
+      label="Search" 
+      value={searchTerm}
+      isFocused={true}
+      onInputChange={onSearchInput}
+    >
+      <strong>Search:</strong>
+    </InputWithLabel>
+
+    <button type="submit" disabled={!searchTerm}>
+      Submit
+    </button>
+  </form>  
+);
+
 const App = () => {
   const storiesReducer = (state, action) => {
     switch (action.type) {
@@ -161,27 +183,20 @@ const App = () => {
     setSearchTerm(event.target.value)
   }
 
-  const handleSearchSubmit = () => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`)
+  const handleSearchSubmit = (event) => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+
+    event.preventDefault();
   }
 
   return (
     <>
       <h1>My Hacker Stories</h1>
-      <InputWithLabel 
-        id="search" 
-        label="Search" 
-        value={searchTerm}
-        isFocused={true}
-        onInputChange={handleSearchInput}
-      >
-        <strong>Search:</strong>
-      </InputWithLabel>
-
-      <button type="button" disabled={!searchTerm}
-        onClick={handleSearchSubmit}>
-          Submit
-      </button>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+      />
       <hr/>
 
       {stories.isError && <p>Something went wrong ...</p>}
